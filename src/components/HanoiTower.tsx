@@ -100,7 +100,7 @@ export const HanoiTower: React.FC<{numberOfRings: number, time: number}> = ({ nu
                             endTowerName = 'C';
                             setTowerC([elementToMove, ...destTower]);
                         }
-                        setInfoText(`STEP: ${step}\nValueToMove: ${valueToMove} \nMove: ${startTowerName}${endTowerName}`);
+                        setInfoText(`STEP: ${step + 1}\nValueToMove: ${valueToMove} \nMove: ${startTowerName}${endTowerName}`);
                     }
                 }
                 setStep(step + 1)
