@@ -2,14 +2,12 @@ import React, { useState } from 'react';
 import { HanoiTower } from './components/HanoiTower';
 
 function App() {
-  const [numberOfRings, setNumberOfRings] = useState(8);
-  const [time, setTime] = useState(200);
+  const [numberOfRings, setNumberOfRings] = useState(3);
+  const [time, setTime] = useState(100);
   const [start, setStart] = useState(false);
   return (
     <div style={{
       width: '100%',
-      height: '100%',
-      minHeight: '500px',
       display: 'flex',
       justifyContent: 'center',
       flexDirection: 'column',
