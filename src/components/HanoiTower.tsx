@@ -5,8 +5,11 @@ import { Element } from './types';
 
 function findValueToMove(currentStep: number) {
     const nextStep = currentStep + 1;
-    const bitDifferenceMask = ((~currentStep & nextStep)).toString(2);
-    const elementToMove = bitDifferenceMask.split("").reverse().join("").indexOf('1');
+    /**
+     * We are moving disk which assigned bit changed to 1 this move
+     */
+    const changedToOneMask = ((~currentStep & nextStep)).toString(2);
+    const elementToMove = changedToOneMask.split("").reverse().join("").indexOf('1');
     return elementToMove;
 }
 
@@ -14,23 +17,19 @@ function findStartingTower(towers: Array<Array<Element>>, valueToFind: number) {
     return towers.find(tower => tower.findIndex(element => element.value === valueToFind) !== -1);
 }
 
-function findDestinationTower(towers: Array<Array<Element>>, startingTower: Array<Element>, valueToMove: number) {
+
+
+function findDestinationTower(numberOfElements: number, towers: Array<Array<Element>>, startingTower: Array<Element>, valueToMove: number) {
     const startingTowerIndex = towers.indexOf(startingTower);
     let destinationTowerIndex: number = -1;
-    for(let i = startingTowerIndex ; i >= 0 ; i--) {
-        let checkedTower = towers[i];
+    const moveLeft = (numberOfElements % 2);
+    let initialPosition = moveLeft ? towers.length - 1 : 0;
+    for(let i = initialPosition ; i >= 0 && i < towers.length ; moveLeft ? i -- : i ++) {
+        let checkedTowerIndex = (startingTowerIndex + i) % towers.length;
+        let checkedTower = towers[checkedTowerIndex];
         if (checkedTower.length === 0 || checkedTower[0].value > valueToMove) {
-            destinationTowerIndex = i;
+            destinationTowerIndex = checkedTowerIndex;
             break;
-        }
-    }
-    if (destinationTowerIndex === -1) {
-        for(let i = towers.length - 1 ; i > startingTowerIndex ; i--) {
-            let checkedTower = towers[i];
-            if (checkedTower.length === 0 || checkedTower[0].value > valueToMove) {
-                destinationTowerIndex = i;
-                break;
-            }
         }
     }
     return towers[destinationTowerIndex];
@@ -47,15 +46,15 @@ function generateInitialTower(numberOfElements: number) {
 
 export const HanoiTower: React.FC<{numberOfRings: number, time: number}> = ({ numberOfRings, time}) => {
     const [INITIAL_TOWER] = React.useState(generateInitialTower(numberOfRings))
-    const [towerA, setTowerA] = React.useState<Element[]>([])
+    const [towerA, setTowerA] = React.useState<Element[]>(INITIAL_TOWER)
     const [towerB, setTowerB] = React.useState<Element[]>([])
-    const [towerC, setTowerC] = React.useState<Element[]>(INITIAL_TOWER)
+    const [towerC, setTowerC] = React.useState<Element[]>([])
     const [step, setStep] = React.useState(0);
     const [infoText, setInfoText] = React.useState('');
     const [error, setError] = React.useState(false);
 
     React.useEffect(() => {
-        if (towerA.length !== INITIAL_TOWER.length) {
+        if (towerC.length !== INITIAL_TOWER.length) {
             setTimeout(() => {
                 const valueToMove = findValueToMove(step);
                 const towers = [towerA, towerB, towerC];
@@ -70,8 +69,8 @@ export const HanoiTower: React.FC<{numberOfRings: number, time: number}> = ({ nu
                 const startTower = findStartingTower(towers, valueToMove);
                 if (startTower) {
                     const elementToMove: Element | undefined = startTower.find(el => el.value === valueToMove);
-                    const destTower = findDestinationTower(towers, startTower, valueToMove);
-                    if (elementToMove) {
+                    const destTower = findDestinationTower(INITIAL_TOWER.length, towers, startTower, valueToMove);
+                    if (elementToMove && destTower) {
                         let startTowerName: string = '';
                         let endTowerName: string = '';
                         // Remove element from start tower
@@ -100,6 +99,7 @@ export const HanoiTower: React.FC<{numberOfRings: number, time: number}> = ({ nu
                             endTowerName = 'C';
                             setTowerC([elementToMove, ...destTower]);
                         }
+                        console.log(towers)
                         setInfoText(`STEP: ${step + 1}\nValueToMove: ${valueToMove} \nMove: ${startTowerName}${endTowerName}`);
                     }
                 }
