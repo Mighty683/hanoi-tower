@@ -23,9 +23,8 @@ function findDestinationTower(numberOfElements: number, towers: Array<Array<Elem
     const startingTowerIndex = towers.indexOf(startingTower);
     let destinationTowerIndex: number = -1;
     const moveLeft = (numberOfElements % 2);
-    let initialPosition = moveLeft ? towers.length - 1 : 0;
-    for(let i = initialPosition ; i >= 0 && i < towers.length ; moveLeft ? i -- : i ++) {
-        let checkedTowerIndex = (startingTowerIndex + i) % towers.length;
+    for(let i = 0 ; i >= 0 && i < towers.length ; i++) {
+        let checkedTowerIndex = (startingTowerIndex + (moveLeft ? towers.length - i : i)) % towers.length;
         let checkedTower = towers[checkedTowerIndex];
         if (checkedTower.length === 0 || checkedTower[0].value > valueToMove) {
             destinationTowerIndex = checkedTowerIndex;
@@ -53,7 +52,7 @@ export const HanoiTower: React.FC<{numberOfRings: number, time: number}> = ({ nu
     const [infoText, setInfoText] = React.useState('');
     const [error, setError] = React.useState(false);
 
-    React.useEffect(() => {
+    React.useEffect(() => { 
         if (towerC.length !== INITIAL_TOWER.length) {
             setTimeout(() => {
                 const valueToMove = findValueToMove(step);
